@@ -1,10 +1,56 @@
 document.addEventListener("DOMContentLoaded", function () {
+    var root = document.documentElement;
     var nav = document.querySelector(".site-nav");
     var reveals = document.querySelectorAll(".reveal");
     var yearNodes = document.querySelectorAll("[data-current-year]");
     var collapseElement = document.querySelector(".navbar-collapse");
     var navLinks = document.querySelectorAll(".navbar-collapse .nav-link");
+    var themeToggle = document.querySelector("[data-theme-toggle]");
+    var themeToggleLabel = themeToggle ? themeToggle.querySelector("[data-theme-label]") : null;
+    var themeStorageKey = "easyparty-theme";
+    var systemThemeQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
     var collapseInstance = null;
+
+    function getStoredTheme() {
+        try {
+            return localStorage.getItem(themeStorageKey);
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function getPreferredTheme() {
+        var storedTheme = getStoredTheme();
+
+        if (storedTheme === "light" || storedTheme === "dark") {
+            return storedTheme;
+        }
+
+        return systemThemeQuery && systemThemeQuery.matches ? "dark" : "light";
+    }
+
+    function applyTheme(theme) {
+        root.setAttribute("data-theme", theme);
+        root.setAttribute("data-bs-theme", theme);
+    }
+
+    function syncThemeToggle(theme) {
+        if (!themeToggle) {
+            return;
+        }
+
+        var nextThemeLabel = theme === "dark" ? "Light mode" : "Dark mode";
+
+        themeToggle.setAttribute("aria-label", "Switch to " + nextThemeLabel.toLowerCase());
+        themeToggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+
+        if (themeToggleLabel) {
+            themeToggleLabel.textContent = nextThemeLabel;
+        }
+    }
+
+    applyTheme(getPreferredTheme());
+    syncThemeToggle(root.getAttribute("data-theme") || "light");
 
     function syncNavState() {
         if (!nav) {
@@ -58,6 +104,41 @@ document.addEventListener("DOMContentLoaded", function () {
     yearNodes.forEach(function (node) {
         node.textContent = String(new Date().getFullYear());
     });
+
+    if (themeToggle) {
+        themeToggle.addEventListener("click", function () {
+            var nextTheme = (root.getAttribute("data-theme") || "light") === "dark" ? "light" : "dark";
+
+            applyTheme(nextTheme);
+            syncThemeToggle(nextTheme);
+
+            try {
+                localStorage.setItem(themeStorageKey, nextTheme);
+            } catch (error) {
+                // Ignore storage failures and still let the in-memory theme change work.
+            }
+        });
+    }
+
+    if (systemThemeQuery) {
+        var syncSystemTheme = function (event) {
+            var storedTheme = getStoredTheme();
+
+            if (storedTheme === "light" || storedTheme === "dark") {
+                return;
+            }
+
+            var nextTheme = event.matches ? "dark" : "light";
+            applyTheme(nextTheme);
+            syncThemeToggle(nextTheme);
+        };
+
+        if (typeof systemThemeQuery.addEventListener === "function") {
+            systemThemeQuery.addEventListener("change", syncSystemTheme);
+        } else if (typeof systemThemeQuery.addListener === "function") {
+            systemThemeQuery.addListener(syncSystemTheme);
+        }
+    }
 
     syncNavState();
     window.addEventListener("scroll", syncNavState, { passive: true });

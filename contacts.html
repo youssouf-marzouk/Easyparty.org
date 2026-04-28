@@ -20,6 +20,18 @@
     </script>
     <!-- End Matomo Code -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function() {
+            var storedTheme = null;
+            try {
+                storedTheme = localStorage.getItem('easyparty-theme');
+            } catch (error) {}
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
     <title>Contact | Easy Party</title>
     <link rel="canonical" href="contacts.html">
     <meta name="description" content="Contact Easy Party by phone, email, WhatsApp, or Instagram to ask about children's entertainment in NY and NJ.">
@@ -63,7 +75,20 @@
                         <li class="nav-item"><a class="nav-link" href="gallery.html">Gallery</a></li>
                         <li class="nav-item"><a class="nav-link active" href="contacts.html" aria-current="page">Contact</a></li>
                     </ul>
-                    <a class="nav-cta" href="book.html">Book Party</a>
+                    <div class="nav-actions">
+                        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false">
+                            <span class="theme-toggle-icon" aria-hidden="true">
+                                <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 3V5.5M12 18.5V21M5.64 5.64L7.41 7.41M16.59 16.59L18.36 18.36M3 12H5.5M18.5 12H21M5.64 18.36L7.41 16.59M16.59 7.41L18.36 5.64M15.5 12C15.5 13.933 13.933 15.5 12 15.5C10.067 15.5 8.5 13.933 8.5 12C8.5 10.067 10.067 8.5 12 8.5C13.933 8.5 15.5 10.067 15.5 12Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                                <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 15.2A8.5 8.5 0 1 1 8.8 4C8.59 4.683 8.48 5.408 8.48 6.16C8.48 10.193 11.747 13.46 15.78 13.46C17.147 13.46 18.426 13.085 19.52 12.433C19.833 13.312 20 14.259 20 15.2Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </span>
+                            <span class="theme-toggle-text" data-theme-label>Dark mode</span>
+                        </button>
+                        <a class="nav-cta" href="book.html">Book Party</a>
+                    </div>
                 </div>
             </div>
         </nav>
